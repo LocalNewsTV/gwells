@@ -271,24 +271,32 @@
       <div v-if="!!companyDetails">
         <p class="mt-3">
           There {{ companyDetails.registrations_count === 1 ? 'is': 'are' }}
-          {{ companyDetails.registrations_count }}
+          <span class="font-weight-bold">{{ companyDetails.registrations_count }}</span>
           {{ companyDetails.registrations_count === 1 ? 'registrant': 'registrants' }}
           listed under
           {{ selectedCompany.name }}{{ selectedCompany.name.slice(-1) === '.' ? '' : '.' }}
         </p>
-
+        <b-table
+          v-if="companyRegistrants.length > 0"
+          id="registrants"
+          striped
+          hover
+          small
+          :items="companyRegistrants"
+          :fields="['name', 'contact_tel', 'contact_email']"
+        >
+          <template v-slot:cell(name)="row">
+            <router-link :to="{ name: 'PersonDetail', params: { person_guid: row.item.person_guid }}">{{ row.item.surname }}, {{ row.item.first_name }}</router-link>
+          </template>
+        </b-table>
         <b-button
-            variant="warning"
-            v-if="!companyDetails.registrations_count"
-            @click="companyDeleteConfirm()"
-            >Delete this company</b-button>
-            <div v-else>
-              <b-button
-                  variant="warning"
-                  disabled
-                  title="Company has registrants">Delete this company</b-button>
-                  <p>You must remove registrants from this company before deleting.</p>
-            </div>
+          variant="danger"
+          :disabled="companyDetails.registrations_count > 0"
+          @click="companyDeleteConfirm()"
+        >
+          Delete this company
+        </b-button>
+        <p v-if="companyDetails.registrations_count > 0" class="delete-company">You must remove all registrants from this company before deleting.</p>
       </div>
       <b-modal
           id="orgDeleteModal"
@@ -350,7 +358,7 @@ export default {
 
       // company details from API (loaded after selecting a company)
       companyDetails: null,
-
+      companyRegistrants: [],
       // company form fields
       companyForm: {
         name: '',
@@ -507,11 +515,18 @@ export default {
     loadCompanyDetails () {
       // List of companies only contains basic details. When one is selected, get the full set of details
       // plus all notes for that company
-      ApiService.get('organizations', this.selectedCompany.org_guid).then((response) => {
-        this.companyDetails = response.data
-      }).catch((e) => {
-        this.companyListError = e.response.data
-      })
+      ApiService.get('organizations', this.selectedCompany.org_guid)
+        .then((response) => {
+          this.companyRegistrants = [];
+          this.companyDetails = response.data
+          // Fetch data on Registrants
+          ApiService.query(`drillers?search=${encodeURIComponent(this.companyDetails.name)}`)
+            .then(({data}) => {
+              this.companyRegistrants = data.results;
+            });
+        }).catch((e) => {
+          this.companyListError = e.response.data
+        })
 
       // update changeHistory when company is updated
       if (this.$refs.changeHistory) {
@@ -545,5 +560,10 @@ export default {
 </script>
 
 <style>
-
+  .delete-company {
+    margin: 0.25em 0;
+  }
+  button:disabled {
+    cursor: not-allowed
+  }
 </style>
