@@ -126,7 +126,7 @@
               <b-btn variant="light" @click="confirmEditNoteModal=false" ref="cancelEditNoteCancelBtn">
                 Cancel
               </b-btn>
-              <b-btn variant="primary" :disabled="invalidEditNoteLength" @click="notePatchHandle()">
+              <b-btn variant="primary" :disabled="invalidEditNoteLength || !noteContentEdit" @click="notePatchHandle()">
                 Submit
               </b-btn>
             </div>
@@ -261,7 +261,7 @@ export default {
         .then(() => {
           this.noteReset();
           this.activeNote = null;
-          this.noteContentEdit = null;
+          this.noteContentEdit = "";
           this.confirmEditNoteModal = false;
           this.alertText = "Note updated."
           this.submitSuccess = true;
