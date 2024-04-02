@@ -21,6 +21,7 @@
           >
             {{ alertText }}
           </b-alert>
+          <!-- Submit Modal -->
           <b-modal
               v-model="confirmSubmitModal"
               centered
@@ -38,6 +39,7 @@
               </b-btn>
             </div>
           </b-modal>
+          <!-- Cancellation Modal -->
           <b-modal
               v-model="confirmCancelModal"
               centered
@@ -55,6 +57,7 @@
               </b-btn>
             </div>
           </b-modal>
+          <!-- Delete Note Modal  -->
           <b-modal
               v-model="confirmDeleteModal"
               centered
@@ -62,8 +65,8 @@
               @shown="focusDeleteModal"
               :return-focus="$refs.noteInputCancelBtn">
               <p>Are you sure you want to delete this note?</p>
-              <div v-if="activeNote" >
-                <p class="font-weight-bold">"{{activeNote.note}}"</p>
+              <div v-if="activeNote" class="">
+                <p class="font-weight-bold wb">"{{activeNote.note}}"</p>
               </div>
             <div slot="modal-footer" class="buttons">
               <b-btn
@@ -81,6 +84,7 @@
               </b-btn>
             </div>
           </b-modal>
+          <!-- Edit Modal -->
           <b-modal
               v-model="confirmEditNoteModal"
               centered
@@ -113,7 +117,7 @@
           <b-row><b-col>No notes for this record.</b-col></b-row>
         </div>
         <div class="mt-5 note-container" v-if="notes && notes.length">
-          <div class="note" v-for="(note, index) in notes" :key="`note ${index}`" :id="`note-${index}`">
+          <div class="note wb" v-for="(note, index) in notes" :key="`note ${index}`" :id="`note-${index}`">
             <p>
               <span class="font-weight-bold">{{ note.author }}</span> ({{ note.date | moment("MMMM Do YYYY [at] LT") }}):
               {{ note.note }}
@@ -314,5 +318,8 @@ export default {
 }
 .buttons button:last-child {
   margin-left: 0.5em;
+}
+.wb {
+  word-break: break-all;
 }
 </style>
