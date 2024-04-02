@@ -300,8 +300,10 @@ export default {
      * @param {Object} note Note currently being edited
      */
     noteEditHandler (note) {
-      const editRegex = /^\(Edited \d{1,2}\/\d{1,2}\/\d{4}, \d{1,2}:\d{2}:\d{2} (AM|PM)\)\s/;
-      this.noteContentEdit = note.note.replace(editRegex, "");
+      const editRegexChromium = /^\(Edited \d{1,2}\/\d{1,2}\/\d{4}, \d{1,2}:\d{2}:\d{2} (AM|PM)\)\s/;
+      const editRegexFirefox =  /^\(Edited \d{4}-\d{1,2}-\d{1,2}, \d{1,2}:\d{2}:\d{2} (a.m.|p.m.)\)\s/;
+      this.noteContentEdit = note.note.replace(editRegexChromium, "");
+      this.noteContentEdit = this.noteContentEdit.replace(editRegexFirefox, "");
       this.activeNote = note;
       this.confirmEditNoteModal = true;
     },
