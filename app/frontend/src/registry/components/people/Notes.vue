@@ -10,8 +10,23 @@
               label-for="noteInput">
             <b-form-textarea id="noteInput" v-model="noteInput" :rows="3" :max-rows="6" :disabled="submitLoading"></b-form-textarea>
           </b-form-group>
-          <b-button type="submit" variant="primary" :disabled="!noteInput || submitLoading" ref="noteInputSaveBtn">Save</b-button>
+          <div class="submit-row">
+            <b-button
+            type="submit"
+            variant="primary"
+            :disabled="!noteInput || submitLoading || invalidNewNoteLength"
+            ref="noteInputSaveBtn"
+          >
+            Save
+          </b-button>
           <b-button type="reset" variant="light" :disabled="!noteInput" ref="noteInputCancelBtn">Cancel</b-button>
+            <p
+              class="font-weight-bold text-count"
+              :class="[invalidNewNoteLength ? 'error': '']"
+            >
+              {{ noteInput.length }}/{{ maxNoteLength }}
+            </p>
+          </div>
           <b-alert
             class="mt-3"
             variant="success"
@@ -100,12 +115,18 @@
                 rows="4"
                 max-rows="6"
               />
+              <p
+              class="font-weight-bold text-count"
+              :class="[invalidEditNoteLength ? 'error': '']"
+            >
+              {{ noteContentEdit.length }}/{{ maxNoteLength }}
+            </p>
             </div>
             <div slot="modal-footer" class="buttons">
               <b-btn variant="light" @click="confirmEditNoteModal=false" ref="cancelEditNoteCancelBtn">
                 Cancel
               </b-btn>
-              <b-btn variant="primary" @click="notePatchHandle()">
+              <b-btn variant="primary" :disabled="invalidEditNoteLength" @click="notePatchHandle()">
                 Submit
               </b-btn>
             </div>
@@ -177,7 +198,8 @@ export default {
       confirmCancelModal: false,
       confirmDeleteModal: false,
       noteContentEdit: "",
-      activeNote: null
+      activeNote: null,
+      maxNoteLength: 900
     }
   },
   computed: {
@@ -187,6 +209,8 @@ export default {
       }
       return []
     },
+    invalidNewNoteLength () { return this.noteInput.length > this.maxNoteLength },
+    invalidEditNoteLength () { return this.noteContentEdit.length > this.maxNoteLength; },
     resourceType () {
       // map 'resource' names (e.g. organization, person) to API friendly plural versions
       // - this is also the list of resources that currently accept notes
@@ -207,6 +231,9 @@ export default {
         this.submitSuccess = true;
         this.$emit('updated');
       })
+      .catch((e) => {
+        this.errorHandler(e);
+      })
     },
     noteSubmit () {
       // submit the note as a post request, triggered after confirming via popup
@@ -224,14 +251,15 @@ export default {
           smoothScroll(notes, 1000);
           this.$emit('updated');;
         }).catch((e) => {
-          this.submitLoading = false;
-          this.submitError = e.response.data;
+          this.errorHandler(e);
         })
     },
     notePatchHandle() {
       const updatedNote = `(Edited ${new Date().toLocaleString()}) ` + this.noteContentEdit;
+
       ApiService.patch(`${this.resourceType}/${this.guid}/notes`, this.activeNote.org_note_guid, {note: updatedNote})
         .then(() => {
+          this.noteReset();
           this.activeNote = null;
           this.noteContentEdit = null;
           this.confirmEditNoteModal = false;
@@ -239,7 +267,16 @@ export default {
           this.submitSuccess = true;
           this.$emit('updated');
         })
-
+        .catch((e) => {
+          this.errorHandler(e);
+        })
+    },
+    errorHandler(e){
+      this.submitLoading = false;
+      if(e.response.status === 500) { this.submitError = "Service unavailable - try again later"; }
+      else { this.submitError = e.response.data; }
+      console.log(this.submitError)
+      alert(`An error has occured:\n\n${this.submitError}`);
     },
     noteReset () {
       this.submitSuccess = false;
@@ -321,5 +358,17 @@ export default {
 }
 .wb {
   word-break: break-all;
+}
+.error {
+  color: red;
+}
+.text-count {
+  width: 100%;
+  text-align: right;
+  padding: 0.5em 1em 0 0;
+}
+.submit-row {
+  display: flex;
+  flex-direction: row;
 }
 </style>
