@@ -275,7 +275,6 @@ export default {
       this.submitLoading = false;
       if(e.response.status === 500) { this.submitError = "Service unavailable - try again later"; }
       else { this.submitError = e.response.data; }
-      console.log(this.submitError)
       alert(`An error has occured:\n\n${this.submitError}`);
     },
     noteReset () {
