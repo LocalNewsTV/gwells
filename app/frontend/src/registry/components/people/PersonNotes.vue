@@ -94,12 +94,9 @@
                 rows="4"
                 max-rows="6"
               />
-              <p
-              class="font-weight-bold text-count"
-              :class="[invalidEditNoteLength ? 'error': '']"
-            >
+              <p class="font-weight-bold text-count" :class="[invalidEditNoteLength ? 'error': '']">
               {{ noteContentEdit.length }}/{{ maxNoteLength }}
-            </p>
+              </p>
             </div>
             <div slot="modal-footer" class="buttons">
               <b-btn variant="light" @click="confirmEditNoteModal=false" ref="cancelEditNoteCancelBtn">
@@ -174,7 +171,6 @@ export default {
   computed: {
     notes () {
       if (this.currentDriller && this.currentDriller.notes) {
-        console.log(this.currentDriller)
         return this.currentDriller.notes
       }
       return []
@@ -231,7 +227,7 @@ export default {
       this.$refs.cancelDeleteBtn.focus();
     },
     deleteNote() {
-      ApiService.delete(`${this.resourceType}/${this.guid}/notes`, this.activeNote.org_note_guid)
+      ApiService.delete(`drillers/${this.currentDriller.person_guid}/notes`, this.activeNote.person_note_guid)
       .then(() => {
         this.activeNote = null;
         this.alertText = "Note deleted.";
@@ -244,7 +240,6 @@ export default {
     },
     notePatchHandle() {
       const updatedNote = `(Edited ${new Date().toLocaleString()}) ` + this.noteContentEdit;
-      console.log(this.activeNote)
       ApiService.patch(`drillers/${this.currentDriller.person_guid}/notes`, this.activeNote.person_note_guid, {note: updatedNote})
         .then(() => {
           this.noteReset();
