@@ -10,8 +10,16 @@
               label-for="noteInput">
             <b-form-textarea id="noteInput" v-model="noteInput" :rows="3" :max-rows="6" :disabled="submitLoading"></b-form-textarea>
           </b-form-group>
-          <b-button type="submit" variant="primary" :disabled="!noteInput || submitLoading" ref="noteInputSaveBtn">Save</b-button>
-          <b-button type="reset" variant="light" :disabled="!noteInput" ref="noteInputCancelBtn">Cancel</b-button>
+          <div class="submit-row">
+            <b-button type="submit" variant="primary" :disabled="!noteInput || submitLoading" ref="noteInputSaveBtn">Save</b-button>
+            <b-button type="reset" variant="light" :disabled="!noteInput" ref="noteInputCancelBtn">Cancel</b-button>
+            <p
+              class="font-weight-bold text-count"
+              :class="[invalidNewNoteLength ? 'error': '']"
+            >
+              {{ noteInput.length }}/{{ maxNoteLength }}
+            </p>
+          </div>
           <b-alert
               class="mt-3"
               variant="success"
