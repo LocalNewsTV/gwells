@@ -13,7 +13,8 @@ const GET_DEFAULT_STORE_MODULES = () => {
     auth: {
       getters: {
         user: () => null,
-        userRoles: () => ({ registry: { edit: true, view: true, approve: true } })
+        userRoles: () => ({ registry: { edit: true, view: true, approve: true } }),
+        keycloak: () => ({idTokenParsed: { displayName: fakePerson.first_name}})
       }
     },
     registriesStore: {
@@ -22,7 +23,7 @@ const GET_DEFAULT_STORE_MODULES = () => {
         loading: () => false,
         error: () => null,
         currentDriller: jest.fn().mockReturnValue(fakePerson),
-        searchResponse: () => []
+        searchResponse: () => [],
       },
       actions: {
       },
