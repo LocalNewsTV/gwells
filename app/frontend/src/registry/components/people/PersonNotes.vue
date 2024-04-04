@@ -50,16 +50,97 @@
               </b-btn>
             </div>
           </b-modal>
+          <!-- Delete Note Modal  -->
+          <b-modal
+            v-model="confirmDeleteModal"
+            centered
+            title="Confirm Deletion"
+            @shown="focusDeleteModal"
+            :return-focus="$refs.noteInputCancelBtn"
+          >
+            <p>Are you sure you want to delete this note?</p>
+            <div v-if="activeNote" class="">
+              <p class="font-weight-bold wb">"{{activeNote.note}}"</p>
+            </div>
+            <div slot="modal-footer" class="buttons">
+              <b-btn
+                variant="light"
+                @click="confirmDeleteModal=false"
+                ref="cancelDeleteBtn"
+              >
+                Cancel
+              </b-btn>
+              <b-btn
+                variant="danger"
+                @click="confirmDeleteModal=false;deleteNote()"
+              >
+                Delete
+              </b-btn>
+            </div>
+          </b-modal>
+          <!-- Edit Modal -->
+          <b-modal
+              v-model="confirmEditNoteModal"
+              centered
+              title="Editing Note"
+              @shown="focusEditNoteModal"
+              :return-focus="$refs.noteInputCancelBtn"
+            >
+            <div>
+              <b-form-textarea
+                id="editNoteTextArea"
+                v-model="noteContentEdit"
+                placeholder="Edit Note..."
+                rows="4"
+                max-rows="6"
+              />
+              <p
+              class="font-weight-bold text-count"
+              :class="[invalidEditNoteLength ? 'error': '']"
+            >
+              {{ noteContentEdit.length }}/{{ maxNoteLength }}
+            </p>
+            </div>
+            <div slot="modal-footer" class="buttons">
+              <b-btn variant="light" @click="confirmEditNoteModal=false" ref="cancelEditNoteCancelBtn">
+                Cancel
+              </b-btn>
+              <b-btn variant="primary" :disabled="invalidEditNoteLength || !noteContentEdit" @click="notePatchHandle()">
+                Submit
+              </b-btn>
+            </div>
+          </b-modal>
         </b-form>
       </div>
       <div id="notesList" ref="notes">
         <div v-if="!notes || !notes.length">
           <b-row><b-col>No notes for this person.</b-col></b-row>
         </div>
-        <div v-if="notes && notes.length">
-          <div class="mt-3" v-for="(note, index) in notes" :key="`note ${index}`" :id="`person-note-${index}`">
+        <div class="mt-5 note-container" v-if="notes && notes.length">
+          <div class="note wb" v-for="(note, index) in notes" :key="`note ${index}`" :id="`person-note-${index}`">
+            <p>
               <span class="font-weight-bold">{{ note.author }}</span> ({{ note.date | moment("MMMM Do YYYY [at] LT") }}):
               {{ note.note }}
+            </p>
+            <div class="crud-options">
+              <b-btn
+                :disabled="keycloak.idTokenParsed.display_name !== note.author" 
+                @click="noteEditHandler(note)"
+                size="sm"
+                variant="primary"
+              >
+                <i class="fa fa-edit"></i>
+                Edit
+              </b-btn>
+              <b-btn
+                :disabled="!userRoles.registry.admin && keycloak.idTokenParsed.display_name !== note.author"
+                @click="noteDeleteHandler(note)"
+                size="sm"
+                variant="danger"
+              >
+                &#x2715;
+              </b-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -81,19 +162,28 @@ export default {
       submitLoading: false,
       submitSuccess: false,
       submitError: false,
+      confirmEditNoteModal: false,
       confirmSubmitModal: false,
-      confirmCancelModal: false
+      confirmCancelModal: false,
+      confirmDeleteModal: false,
+      noteContentEdit: "",
+      activeNote: null,
+      maxNoteLength: 900
     }
   },
   computed: {
     notes () {
       if (this.currentDriller && this.currentDriller.notes) {
+        console.log(this.currentDriller)
         return this.currentDriller.notes
       }
       return []
     },
+    invalidNewNoteLength () { return this.noteInput.length > this.maxNoteLength },
+    invalidEditNoteLength () { return this.noteContentEdit.length > this.maxNoteLength; },
     ...mapGetters([
-      'userRoles'
+      'userRoles',
+      'keycloak'
     ]),
     ...mapGetters('registriesStore', [
       'currentDriller'
@@ -118,6 +208,62 @@ export default {
           this.submitLoading = false
           this.submitError = e.response.data
         })
+    },
+    noteEditHandler (note) {
+      const editRegexChromium = /^\(Edited \d{1,2}\/\d{1,2}\/\d{4}, \d{1,2}:\d{2}:\d{2} (AM|PM)\)\s/;
+      const editRegexFirefox =  /^\(Edited \d{4}-\d{1,2}-\d{1,2}, \d{1,2}:\d{2}:\d{2} (a.m.|p.m.)\)\s/;
+      this.noteContentEdit = note.note.replace(editRegexChromium, "");
+      this.noteContentEdit = this.noteContentEdit.replace(editRegexFirefox, "");
+      this.activeNote = note;
+      this.confirmEditNoteModal = true;
+    },
+    noteDeleteHandler (note) {
+      this.activeNote = note;
+      this.confirmDeleteModal = true;
+    },
+    noteCancelDeleteHandler () {
+      this.activeNote = null;
+    },
+    focusEditNoteModal () {
+      this.$refs.cancelEditNoteCancelBtn.focus()
+    },
+    focusDeleteModal () {
+      this.$refs.cancelDeleteBtn.focus();
+    },
+    deleteNote() {
+      ApiService.delete(`${this.resourceType}/${this.guid}/notes`, this.activeNote.org_note_guid)
+      .then(() => {
+        this.activeNote = null;
+        this.alertText = "Note deleted.";
+        this.submitSuccess = true;
+        this.$emit('updated');
+      })
+      .catch((e) => {
+        this.errorHandler(e);
+      })
+    },
+    notePatchHandle() {
+      const updatedNote = `(Edited ${new Date().toLocaleString()}) ` + this.noteContentEdit;
+      console.log(this.activeNote)
+      ApiService.patch(`drillers/${this.currentDriller.person_guid}/notes`, this.activeNote.person_note_guid, {note: updatedNote})
+        .then(() => {
+          this.noteReset();
+          this.activeNote = null;
+          this.noteContentEdit = "";
+          this.confirmEditNoteModal = false;
+          this.alertText = "Note updated."
+          this.submitSuccess = true;
+          this.$emit('updated');
+        })
+        .catch((e) => {
+          this.errorHandler(e);
+        })
+    },
+    errorHandler(e){
+      this.submitLoading = false;
+      if (e.response.status === 500) { this.submitError = "Service unavailable - try again later"; }
+      else { this.submitError = e.response.data; }
+      alert(`An error has occured:\n\n${this.submitError}`);
     },
     noteReset () {
       this.submitSuccess = false
@@ -145,6 +291,48 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss">
+.crud-options {
+  display: flex;
+  margin-left: 0.5em;
+  width: auto;
+}
+.crud-options button:last-child {
+  margin-left: 0.5em;
+}
+.note {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5em;
+  border-radius: 4pt;
+}
+.note:hover {
+  transition: 0.2s;
+  background-color: #F8F8F8;
+}
+.note p {
+  padding: 0;
+  margin: 0;
+}
+.buttons button:last-child {
+  margin-left: 0.5em;
+}
+.wb {
+  word-break: break-all;
+}
+.error {
+  color: red;
+}
+.text-count {
+  width: 100%;
+  text-align: right;
+  padding: 0.5em 1em 0 0;
+}
+.submit-row {
+  display: flex;
+  flex-direction: row;
+}
 </style>
