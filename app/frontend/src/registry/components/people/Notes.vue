@@ -74,15 +74,16 @@
           </b-modal>
           <!-- Delete Note Modal  -->
           <b-modal
-              v-model="confirmDeleteModal"
-              centered
-              title="Confirm Deletion"
-              @shown="focusDeleteModal"
-              :return-focus="$refs.noteInputCancelBtn">
-              <p>Are you sure you want to delete this note?</p>
-              <div v-if="activeNote" class="">
-                <p class="font-weight-bold wb">"{{activeNote.note}}"</p>
-              </div>
+            v-model="confirmDeleteModal"
+            centered
+            title="Confirm Deletion"
+            @shown="focusDeleteModal"
+            :return-focus="$refs.noteInputCancelBtn"
+          >
+            <p>Are you sure you want to delete this note?</p>
+            <div v-if="activeNote" class="">
+              <p class="font-weight-bold wb">"{{activeNote.note}}"</p>
+            </div>
             <div slot="modal-footer" class="buttons">
               <b-btn
                 variant="light"

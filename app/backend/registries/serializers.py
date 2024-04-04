@@ -34,7 +34,6 @@ from registries.models import (
     AccreditedCertificateCode,
     WellClassCode,
     PersonNote,
-    PersonNote,
     OrganizationNote,
     RegionalArea
 )
