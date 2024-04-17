@@ -37,9 +37,10 @@ import ApiService from '@/common/services/ApiService.js'
 
 const PRODUCTION_GWELLS_URL = 'https://apps.nrs.gov.bc.ca/gwells'
 const STAGING_GWELLS_URLS = ['testapps.nrs.gov.bc.ca', 'gwells-staging.apps.silver.devops.gov.bc.ca']
+const BASE_PATH = '/gwells/'
 const isProduction = () => (window.location.href.substr(0, PRODUCTION_GWELLS_URL.length) === PRODUCTION_GWELLS_URL)
 const isStaging = () => (
-  window.location.pathname === '/gwells/' && STAGING_GWELLS_URLS.includes(window.location.hostname)
+  window.location.pathname.substr(0, BASE_PATH.length ) === BASE_PATH && STAGING_GWELLS_URLS.includes(window.location.hostname)
 )
 if (isProduction()) {
   Sentry.init({
