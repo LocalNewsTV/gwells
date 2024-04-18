@@ -88,7 +88,7 @@ else if (isStaging()) {
   Vue.use(VueMatomo, {
     host: 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/',
     siteId: 3,
-    router: router,
+    router: router
   })
 }
 
