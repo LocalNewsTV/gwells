@@ -78,12 +78,17 @@ if (isProduction()) {
     domains: 'apps.nrs.gov.bc.ca'
   })
 }
-else {
+else if (isStaging()) {
   Vue.use(VueMatomo, {
     host: 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/',
-    siteId: 4,
+    siteId: 1,
     router: router,
     domains: STAGING_GWELLS_URLS
+  })
+} else {
+  Vue.use(VueMatomo, {
+    host: 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/',
+    siteId: 3,
   })
 }
 
