@@ -983,7 +983,7 @@ export default {
         this.waterWithdrawlVolume = sumBy(details.usage, 'total_qty')
       }
     },
-    // log a google analytics event when clicking on links to other sites
+    /* // log a google analytics event when clicking on links to other sites
     handleOutboundLinkClicks (link) {
       if (window.ga) {
         window.ga('send', 'event', {
@@ -1003,7 +1003,7 @@ export default {
           eventLabel: 'Aquifer Factsheet'
         })
       }
-    },
+    }, */
     sanitizeResourceUrl (url) {
       const sanitized = sanitizeUrl(url)
       return encodeURI(sanitized)

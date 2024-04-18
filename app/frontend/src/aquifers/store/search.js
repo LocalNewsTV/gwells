@@ -131,14 +131,14 @@ const aquiferSearchStore = {
 
       // trigger the Google Analytics search event
       // trigger the search event, sending along the search params as a string
-      if (window.ga) {
-        window.ga('send', {
-          hitType: 'event',
-          eventCategory: 'Button',
-          eventAction: 'AquiferSearch',
-          eventLabel: querystring.stringify(state.searchQuery)
-        })
-      }
+      // if (window.ga) {
+      //   window.ga('send', {
+      //     hitType: 'event',
+      //     eventCategory: 'Button',
+      //     eventAction: 'AquiferSearch',
+      //     eventLabel: querystring.stringify(state.searchQuery)
+      //   })
+      // }
 
       if (state.pendingSearch) {
         state.pendingSearch.cancel()
