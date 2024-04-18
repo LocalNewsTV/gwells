@@ -110,6 +110,6 @@ new Vue({
   },
   created () {
     this.FETCH_CONFIG()
-    this.$ga.page()
+    window._paq.push(['trackPageView']); //To track pageview
   }
 })
