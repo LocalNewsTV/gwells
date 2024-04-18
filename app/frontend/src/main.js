@@ -70,16 +70,6 @@ Vue.component('form-input', FormInput)
 // set baseURL and default headers
 ApiService.init()
 
-Vue.use(VueAnalytics, {
-  id: 'UA-106174915-1',
-  set: [
-    { field: 'anonymizeIp', value: true }
-  ],
-  disabled: ApiService.query('analytics', {}).then((response) => {
-    return response.data.enable_google_analytics !== true
-  })
-})
-
 if (isProduction()) {
   Vue.use(VueMatomo, {
     host: 'https://water-matomo.apps.silver.devops.gov.bc.ca/',
@@ -88,10 +78,9 @@ if (isProduction()) {
     domains: 'apps.nrs.gov.bc.ca'
   })
 }
-
-if (isStaging()) {
+else {
   Vue.use(VueMatomo, {
-    host: 'https://water-matomo.apps.silver.devops.gov.bc.ca/',
+    host: 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/',
     siteId: 4,
     router: router,
     domains: STAGING_GWELLS_URLS
