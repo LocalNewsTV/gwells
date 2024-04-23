@@ -18,6 +18,7 @@ import * as Integrations from '@sentry/integrations'
 import Vuex, { mapActions } from 'vuex'
 import VueNoty from 'vuejs-noty'
 import BootstrapVue from 'bootstrap-vue'
+import VueAnalytics from 'vue-analytics'
 import VueMatomo from 'vue-matomo'
 import App from './App'
 import router from './router.js'
@@ -68,6 +69,16 @@ Vue.component('form-input', FormInput)
 
 // set baseURL and default headers
 ApiService.init()
+
+Vue.use(VueAnalytics, {
+  id: 'UA-106174915-1',
+  set: [
+    { field: 'anonymizeIp', value: true }
+  ],
+  disabled: ApiService.query('analytics', {}).then((response) => {
+    return response.data.enable_google_analytics !== true
+  })
+})
 
 if (isProduction()) {
   Vue.use(VueMatomo, {
