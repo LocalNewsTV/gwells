@@ -18,6 +18,7 @@ import * as Integrations from '@sentry/integrations'
 import Vuex, { mapActions } from 'vuex'
 import VueNoty from 'vuejs-noty'
 import BootstrapVue from 'bootstrap-vue'
+import VueAnalytics from 'vue-analytics'
 import VueMatomo from 'vue-matomo'
 import App from './App'
 import router from './router.js'
@@ -36,10 +37,9 @@ import ApiService from '@/common/services/ApiService.js'
 
 const PRODUCTION_GWELLS_URL = 'https://apps.nrs.gov.bc.ca/gwells'
 const STAGING_GWELLS_URLS = ['testapps.nrs.gov.bc.ca', 'gwells-staging.apps.silver.devops.gov.bc.ca']
-const BASE_PATH = '/gwells/'
-const isProduction = () => (window.location.href.startsWith(PRODUCTION_GWELLS_URL) === PRODUCTION_GWELLS_URL)
+const isProduction = () => (window.location.href.substr(0, PRODUCTION_GWELLS_URL.length) === PRODUCTION_GWELLS_URL)
 const isStaging = () => (
-  window.location.pathname.startsWith(BASE_PATH) === BASE_PATH && STAGING_GWELLS_URLS.includes(window.location.hostname)
+  window.location.pathname === '/gwells/' && STAGING_GWELLS_URLS.includes(window.location.hostname)
 )
 if (isProduction()) {
   Sentry.init({
@@ -68,6 +68,16 @@ Vue.component('form-input', FormInput)
 
 // set baseURL and default headers
 ApiService.init()
+
+Vue.use(VueAnalytics, {
+  id: 'UA-106174915-1',
+  set: [
+    { field: 'anonymizeIp', value: true }
+  ],
+  disabled: ApiService.query('analytics', {}).then((response) => {
+    return response.data.enable_google_analytics !== true
+  })
+})
 
 if (isProduction()) {
   Vue.use(VueMatomo, {
@@ -105,5 +115,6 @@ new Vue({
   },
   created () {
     this.FETCH_CONFIG()
+    this.$ga.page()
   }
 })
