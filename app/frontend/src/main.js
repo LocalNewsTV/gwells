@@ -90,15 +90,15 @@ if (isProduction()) {
 }
 else if (isStaging()) {
   Vue.use(VueMatomo, {
-    host: 'https://water-matomo.apps.silver.devops.gov.bc.ca/',
-    siteId: 4,
+    host: 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/',
+    siteId: 1,
     router: router,
     domains: STAGING_GWELLS_URLS
   })
 } else {
   Vue.use(VueMatomo, {
-    host: 'https://water-matomo.apps.silver.devops.gov.bc.ca/',
-    siteId: 5,
+    host: 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/',
+    siteId: 3,
     router: router
   })
 }
@@ -121,6 +121,7 @@ new Vue({
   },
   created () {
     this.FETCH_CONFIG()
-    this.$ga.page() //To track pageview
+    //this.$ga.page()
+    window._paq.push(['trackPageView']); //To track pageview
   }
 })
