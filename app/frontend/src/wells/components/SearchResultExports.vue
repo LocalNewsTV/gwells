@@ -107,18 +107,7 @@ export default {
     exportHandler(format) {
       const exportUrl = this.getExportUrl(format);
       ApiService.download(exportUrl);
-      this.sendAnalytics(format);
     },
-    sendAnalytics (format) {
-      /* if (window.ga) {
-        window.ga('send', {
-          hitType: 'event',
-          eventCategory: 'Button',
-          eventAction: 'WellSearchResultsExtract',
-          eventLabel: format
-        })
-      } */
-    }
   }
 }
 </script>
