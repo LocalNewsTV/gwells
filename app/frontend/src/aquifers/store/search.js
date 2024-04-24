@@ -12,7 +12,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-//import querystring from 'querystring'
 
 import ApiService from '@/common/services/ApiService.js'
 

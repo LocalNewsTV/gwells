@@ -35,12 +35,15 @@ import filters from '@/common/filters'
 // GWELLS js API library (helper methods for working with API)
 import ApiService from '@/common/services/ApiService.js'
 
-const PRODUCTION_GWELLS_URL = 'https://apps.nrs.gov.bc.ca/gwells'
-const STAGING_GWELLS_URLS = ['testapps.nrs.gov.bc.ca', 'gwells-staging.apps.silver.devops.gov.bc.ca']
-const BASE_PATH = '/gwells/'
-const isProduction = () => (window.location.href.substring(0, PRODUCTION_GWELLS_URL.length) === PRODUCTION_GWELLS_URL)
+const PRODUCTION_GWELLS_URL = 'https://apps.nrs.gov.bc.ca/gwells';
+const STAGING_GWELLS_URLS = ['testapps.nrs.gov.bc.ca', 'gwells-staging.apps.silver.devops.gov.bc.ca'];
+const BASE_PATH = '/gwells/';
+const PRODUCTION_MATOMO_HOST = 'https://water-matomo.apps.silver.devops.gov.bc.ca/';
+const TEST_MATOMO_HOST = 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/';
+
+const isProduction = () => (window.location.href.includes(PRODUCTION_GWELLS_URL))//Does not return true for the production site @https://gwells.apps.silver.devops.gov.bc.ca/gwells
 const isStaging = () => (
-  window.location.pathname.substring(0, BASE_PATH.length ) === BASE_PATH && STAGING_GWELLS_URLS.includes(window.location.hostname)
+  window.location.pathname.includes(BASE_PATH) && STAGING_GWELLS_URLS.includes(window.location.hostname)
 )
 if (isProduction()) {
   Sentry.init({
@@ -72,7 +75,7 @@ ApiService.init()
 
 if (isProduction()) {
   Vue.use(VueMatomo, {
-    host: 'https://water-matomo.apps.silver.devops.gov.bc.ca/',
+    host: PRODUCTION_MATOMO_HOST,
     siteId: 2,
     router: router,
     domains: 'apps.nrs.gov.bc.ca'
@@ -80,14 +83,14 @@ if (isProduction()) {
 }
 else if (isStaging()) {
   Vue.use(VueMatomo, {
-    host: 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/',
+    host: TEST_MATOMO_HOST,
     siteId: 1,
     router: router,
     domains: STAGING_GWELLS_URLS
   })
-} else {
+} else { //Local & DEV and anything else
   Vue.use(VueMatomo, {
-    host: 'https://water-matomo-staging.apps.silver.devops.gov.bc.ca/',
+    host: TEST_MATOMO_HOST,
     siteId: 3,
     router: router
   })
@@ -111,7 +114,6 @@ new Vue({
   },
   created () {
     this.FETCH_CONFIG()
-    //this.$ga.page()
-    window._paq.push(['trackPageView']); //To track pageview
+    window._paq.push(['trackPageView']); //To track pageview - Matomo
   }
 })
