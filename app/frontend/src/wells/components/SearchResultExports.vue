@@ -110,14 +110,14 @@ export default {
       this.sendAnalytics(format);
     },
     sendAnalytics (format) {
-      if (window.ga) {
+      /* if (window.ga) {
         window.ga('send', {
           hitType: 'event',
           eventCategory: 'Button',
           eventAction: 'WellSearchResultsExtract',
           eventLabel: format
         })
-      }
+      } */
     }
   }
 }

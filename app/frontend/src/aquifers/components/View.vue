@@ -985,24 +985,24 @@ export default {
     },
     // log a google analytics event when clicking on links to other sites
     handleOutboundLinkClicks (link) {
-      if (window.ga) {
-        window.ga('send', 'event', {
-          eventCategory: 'Outbound Link',
-          eventAction: 'click',
-          eventLabel: link
-        })
-      }
+      // if (window.ga) {
+      //   window.ga('send', 'event', {
+      //     eventCategory: 'Outbound Link',
+      //     eventAction: 'click',
+      //     eventLabel: link
+      //   })
+      // }
     },
     // log a google analytics event when clicking on external aquifer resources
     // (e.g. PDFS or other files)
     handleExternalResourceClicks () {
-      if (window.ga) {
-        window.ga('send', 'event', {
-          eventCategory: 'Attachment',
-          eventAction: 'Accessed',
-          eventLabel: 'Aquifer Factsheet'
-        })
-      }
+      // if (window.ga) {
+      //   window.ga('send', 'event', {
+      //     eventCategory: 'Attachment',
+      //     eventAction: 'Accessed',
+      //     eventLabel: 'Aquifer Factsheet'
+      //   })
+      // }
     },
     sanitizeResourceUrl (url) {
       const sanitized = sanitizeUrl(url)
