@@ -39,4 +39,3 @@ class TestSignals(TestCase):
         self.assertEqual(well.utm_zone_code, 10)
         self.assertEqual(well.utm_easting, 533470)
         self.assertEqual(well.utm_northing, 5456461)
-        

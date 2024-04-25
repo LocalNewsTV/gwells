@@ -39,8 +39,10 @@ test-vue-update:
 vue-coverage:
 	docker exec -ti gwells-frontend-1 /bin/bash -c "cd /app/frontend/; npm run coverage:test"
 
+TEST_PATH ?= "."
+
 test-django:
-	docker exec -ti gwells-backend-1 /bin/bash -c "cd /app/backend/; python -m coverage run manage.py test --noinput"
+	docker exec -ti gwells-backend-1 /bin/bash -c "cd /app/backend/; python -m coverage run manage.py test ${TEST_PATH} --noinput"
 
 django-coverage:
 	docker exec -ti gwells-backend-1 /bin/bash -c "cd /app/backend/; coverage report"
