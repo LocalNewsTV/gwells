@@ -339,7 +339,7 @@ export default {
   min-height: 36rem;
 
   td.data {
-    white-space: nowrap;
+    white-space: wrap;
     overflow-wrap: break-word;
   }
 
